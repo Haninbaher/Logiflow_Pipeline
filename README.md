@@ -1,6 +1,6 @@
 ## 🚀 Data Ingestion Phase (Phase 1)
 
-In this phase, we successfully migrated the **DataCo Smart Supply Chain** dataset into our local Big Data Cluster.
+In this phase, I successfully migrated the **DataCo Smart Supply Chain** dataset into my local Big Data Cluster.
 
 ### 🛠 Prerequisites
 - Docker & Docker Compose.
