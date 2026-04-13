@@ -51,3 +51,26 @@ SELECT count(*) FROM supply_chain_data;
 -- Preview the first few rows
 SELECT * FROM supply_chain_data LIMIT 10;
 ```
+
+## 🐘 Phase 2: Data Orchestration (Sqoop to Hive)
+
+In this phase, we moved the data from our relational storage (PostgreSQL) to our Data Warehouse (Apache Hive) using **Apache Sqoop**.
+
+### 🛠 Steps Taken:
+1. **Connectivity Check:** Verified that the Sqoop container could communicate with the `external_postgres_db` container using the JDBC connector.
+2. **Dynamic Ingestion:** Used a free-form query import method to bypass metadata inconsistencies and special characters in column names.
+3. **Hive Integration:** - Utilized the `--hive-import` flag to automate table creation in Hive.
+   - Handled data distribution using `--split-by "order_id"` for optimized MapReduce performance.
+
+### 🚀 Execution Command:
+```bash
+sqoop-import \
+--connect jdbc:postgresql://external_postgres_db:5432/external \
+--username external \
+--password external \
+--query 'SELECT * FROM supply_chain_data WHERE $CONDITIONS' \
+--split-by "order_id" \
+--hive-import \
+--hive-table raw_supply_chain \
+--create-hive-table \
+--m 1
