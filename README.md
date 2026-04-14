@@ -86,3 +86,72 @@ Power BI / Superset → Dashboards & KPIs
 | **Docker Compose**             | Runs the full data stack in a reproducible environment                               |
 
 ---
+
+## 🟤 Phase 1: Raw Data Ingestion (PostgreSQL)
+
+### 📌 Objective
+
+Load the raw supply chain dataset into PostgreSQL without any transformation, preserving the original structure for downstream processing.
+
+---
+
+### 🧱 What We Did
+
+* Downloaded the **DataCo Supply Chain dataset** from Kaggle
+* Loaded the dataset into PostgreSQL as a **raw table**
+* Stored the data exactly as-is (no cleaning or transformation)
+
+---
+
+### 🧰 Tools Used
+
+* **Python (pandas)** → for reading the CSV file and loading data
+* **SQLAlchemy + psycopg2** → for connecting to PostgreSQL
+* **PostgreSQL (Docker)** → for storing raw data
+
+---
+
+### ⚙️ Implementation
+
+We used a Python script to load the dataset into PostgreSQL:
+
+```python
+import pandas as pd
+from sqlalchemy import create_engine
+
+# Path to dataset
+csv_path = r"C:\Users\Hanin Baher\Downloads\DataCoSupplyChainDataset (1).csv"
+
+# PostgreSQL connection
+engine = create_engine(
+    "postgresql+psycopg2://external:external@localhost:5432/external"
+)
+
+# Read CSV
+df = pd.read_csv(csv_path, encoding="latin1")
+
+# Load into PostgreSQL
+df.to_sql("raw_supply_chain", engine, if_exists="replace", index=False)
+
+print("Loaded successfully")
+print(df.shape)
+```
+
+---
+
+### 📊 Output
+
+* Table created in PostgreSQL:
+
+  ```
+  raw_supply_chain
+  ```
+
+* Dataset size:
+
+  ```
+  ~180,000 rows
+  ~53 columns
+  ```
+
+---
