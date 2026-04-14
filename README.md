@@ -155,3 +155,13 @@ print(df.shape)
   ```
 
 ---
+
+## Phase 5: Spark Integration
+
+- Connected Spark to PostgreSQL using JDBC
+- Successfully loaded raw dataset into Spark DataFrame
+- Previewed data using df.show()
+
+This confirms that Spark can access and process the raw data.
+
+Next step: Transform and split the dataset into structured tables
