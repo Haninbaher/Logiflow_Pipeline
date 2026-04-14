@@ -156,7 +156,7 @@ print(df.shape)
 
 ---
 
-## Phase 5: Spark Integration
+## 🧠 Phase 5: Spark Integration
 
 - Connected Spark to PostgreSQL using JDBC
 - Successfully loaded raw dataset into Spark DataFrame
