@@ -233,7 +233,7 @@ spark.sql("SELECT * FROM customers LIMIT 5").show()
 ```
 ---
 
-## 💎 Phase 6: Analytics Engineering (dbt Modeling)
+## 💎 Phase 5: Analytics Engineering (dbt Modeling)
 
 In this phase, we transitioned from data storage to data transformation using **dbt (data build tool)**. This layer injects business logic into our raw warehouse tables, creating refined, analytics-ready models optimized for BI tools and strategic reporting.
 
