@@ -182,13 +182,34 @@ df.show(5)
 
   ```
 
-## 🏗️ Phase 3: Data Transformation (Spark)
+## 🏗️ Phase 3: Data Transformation (Apache Spark)
 
-- Transformed raw dataset into structured tables:
-  - customers dimension
-  - products dimension
-  - orders fact table
+In this phase, the raw supply chain data is processed using **Apache Spark** to convert it into a structured **Star Schema** optimized for analytical queries and data warehousing.
 
-- Applied deduplication and column selection
+### 🎯 Key Objectives
 
-This step prepares data for analytics and warehousing.
+* **Data Modeling**: Transformed the flat raw dataset into a relational structure consisting of:
+    * **Customers Dimension**: Contains unique customer profiles and attributes.
+    * **Products Dimension**: Handles product categorization and details.
+    * **Orders Fact Table**: The central table containing transactional metrics and foreign keys.
+* **Data Cleaning**: Applied **deduplication** logic to ensure data integrity and handled missing or null values.
+* **Feature Engineering**: Selected relevant columns and optimized data types to ensure efficient storage and faster query performance.
+
+### 🛠️ Implementation Details
+
+The transformation process involves reading the raw JDBC source and mapping it to the new schema:
+
+```python
+# Logic Summary:
+# 1. Remove duplicates from the raw source
+# 2. Select and cast specific columns for the Fact and Dimension tables
+# 3. Save the structured data for downstream analytics
+
+# Example: Creating the Fact Table
+orders_fact = df.select(
+    "order_id", 
+    "customer_id", 
+    "product_id", 
+    "order_date", 
+    "sales_amount"
+).dropDuplicates()
