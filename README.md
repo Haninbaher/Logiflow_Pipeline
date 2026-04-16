@@ -262,3 +262,31 @@ This analytics layer is specifically designed to answer critical business questi
 * **Outcome:** Materialized views that serve as the "Single Source of Truth" for Power BI, Tableau, or Metabase.
 
 > **Status:** ✅ All models successfully compiled and ran. This marks the establishment of the **Analytics Modeling Layer**, enabling data-driven decision-making for the logistics department.
+
+---
+
+## ⚙️ Phase 6: Batch Orchestration (Apache Airflow)
+
+To ensure the pipeline is reliable and production-ready, I implemented **Apache Airflow** to orchestrate the end-to-end workflow. The DAG, named `flowtrack_batch_pipeline`, serves as the control plane for the entire data movement.
+
+### 🤖 Automation Workflow
+The DAG automates the complex dependencies between our processing layers:
+* **Spark Orchestration:** Automatically triggers the Spark batch jobs to transform raw data from the JDBC source into structured Hive warehouse tables (Raw → Clean).
+* **dbt Orchestration:** Upon successful completion of Spark jobs, Airflow triggers the dbt transformation layer to refresh the analytics models (`order_delivery_monitoring`, etc.).
+
+### 🌟 Key Benefits
+* **Elimination of Manual Intervention:** Replaces manual script execution with a scheduled, hands-off workflow.
+* **Dependency Management:** Ensures that the dbt models only run if the Spark data load succeeds, preventing data quality issues.
+* **Reproducibility:** Provides a clear audit trail and the ability to re-run specific tasks or the entire pipeline in case of failure.
+* **Monitoring & Alerting:** Leverages Airflow’s UI to monitor the health of the pipeline and track execution times.
+
+### 🛠️ Technical Setup
+* **DAG ID:** `flowtrack_batch_pipeline`
+* **Operators Used:** `SparkSubmitOperator`, `BashOperator` (for dbt), and `DummyOperator` for flow control.
+* **Schedule:** Configured for automated batch intervals to keep the warehouse updated.
+
+> **Status:** ✅ Fully Operational. The pipeline is now a self-healing, automated system that moves data from source to insights without human oversight.
+
+---
+
+
