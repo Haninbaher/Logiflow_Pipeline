@@ -116,25 +116,21 @@ Load the raw supply chain dataset into PostgreSQL without any transformation, pr
 We used a Python script to load the dataset into PostgreSQL:
 
 ```python
-import pandas as pd
 from sqlalchemy import create_engine
+import pandas as pd
 
-# Path to dataset
-csv_path = r"C:\Users\Hanin Baher\Downloads\DataCoSupplyChainDataset (1).csv"
-
-# PostgreSQL connection
 engine = create_engine(
-    "postgresql+psycopg2://external:external@localhost:5432/external"
+    "postgresql+psycopg2://flowtrack:flowtrack@localhost:5432/flowtrack"
 )
 
-# Read CSV
-df = pd.read_csv(csv_path, encoding="latin1")
+df = pd.read_csv(
+    r"C:\Users\Hanin Baher\Downloads\DataCoSupplyChainDataset (1).csv",
+    encoding="latin1"
+)
 
-# Load into PostgreSQL
 df.to_sql("raw_supply_chain", engine, if_exists="replace", index=False)
 
-print("Loaded successfully")
-print(df.shape)
+print("DONE", df.shape)
 ```
 
 
