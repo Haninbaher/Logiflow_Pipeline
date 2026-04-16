@@ -1,1 +1,75 @@
+import json
+import random
+import time
+from datetime import datetime
 
+import pandas as pd
+from sqlalchemy import create_engine
+from kafka import KafkaProducer
+
+# PostgreSQL connection
+engine = create_engine(
+    "postgresql+psycopg2://flowtrack:flowtrack@postgres:5432/flowtrack"
+)
+
+# Read a sample of orders from fct_orders
+query = """
+SELECT
+    order_id,
+    customer_id,
+    delivery_status,
+    late_delivery_risk,
+    shipping_mode,
+    order_region,
+    order_country,
+    days_for_shipping_real,
+    days_for_shipment_scheduled
+FROM fct_orders
+LIMIT 100
+"""
+
+orders_df = pd.read_sql(query, engine)
+
+producer = KafkaProducer(
+    bootstrap_servers="kafka:29092",
+    value_serializer=lambda v: json.dumps(v).encode("utf-8")
+)
+
+event_types = [
+    "order_created",
+    "packed",
+    "shipped",
+    "in_transit",
+    "out_for_delivery",
+    "delivered"
+]
+
+for _, row in orders_df.iterrows():
+    events = event_types.copy()
+
+    # If late delivery risk exists, add delayed event before delivered
+    if int(row["late_delivery_risk"]) == 1:
+        events.insert(-1, "delayed")
+
+    for event in events:
+        message = {
+            "order_id": int(row["order_id"]),
+            "customer_id": int(row["customer_id"]),
+            "event_time": datetime.utcnow().isoformat(),
+            "event_type": event,
+            "delivery_status": str(row["delivery_status"]),
+            "shipping_mode": str(row["shipping_mode"]),
+            "order_region": str(row["order_region"]),
+            "order_country": str(row["order_country"]),
+            "days_for_shipping_real": int(row["days_for_shipping_real"]),
+            "days_for_shipment_scheduled": int(row["days_for_shipment_scheduled"]),
+            "late_delivery_risk": int(row["late_delivery_risk"])
+        }
+
+        producer.send("shipment_events", value=message)
+        print(f"Sent: {message}")
+
+        time.sleep(random.uniform(0.5, 1.5))
+
+producer.flush()
+producer.close()
