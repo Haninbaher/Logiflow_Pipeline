@@ -231,4 +231,25 @@ spark.sql("SHOW TABLES").show()
 # Verifying data content
 spark.sql("SELECT * FROM customers LIMIT 5").show()
 ```
+---
 
+## 💎 Phase 5: Analytics Engineering (dbt Modeling)
+
+In this phase, we moved from data storage to data transformation using **dbt (data build tool)**. This layer adds business logic to our raw warehouse tables, creating refined models optimized for BI tools and reporting.
+
+### 🚀 First dbt Model: `order_delivery_monitoring`
+The first analytical model was successfully developed and executed. This model sits on top of the `fct_orders` table and is specifically designed to track logistics performance and supply chain efficiency.
+
+### 📊 Key Monitoring Metrics
+The model transforms raw transactional data into actionable shipping insights, including:
+* **Delivery Performance:** Tracks `delivery status` and flags `late delivery risk`.
+* **Time Analysis:** Calculates `actual shipping days` vs. `scheduled shipping days`.
+* **Delay Tracking:** Computes `delay days` to identify bottlenecks.
+* **Geographic & Logistics Context:** Includes `shipping mode`, `order region`, and `order country`.
+
+### 🛠️ dbt Implementation
+* **Layer:** Analytics Modeling (Gold/Mart Layer).
+* **Source:** Built on top of the structured `fct_orders` table in the warehouse.
+* **Outcome:** A materialized view/table ready for visualization in tools like Power BI, Tableau, or Metabase.
+
+> **Status:** ✅ Successfully compiled and ran. This marks the establishment of the **Analytics Modeling Layer**, enabling data-driven decision-making for the logistics department.
