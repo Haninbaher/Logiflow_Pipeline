@@ -233,23 +233,32 @@ spark.sql("SELECT * FROM customers LIMIT 5").show()
 ```
 ---
 
-## 💎 Phase 5: Analytics Engineering (dbt Modeling)
+## 💎 Phase 6: Analytics Engineering (dbt Modeling)
 
-In this phase, we moved from data storage to data transformation using **dbt (data build tool)**. This layer adds business logic to our raw warehouse tables, creating refined models optimized for BI tools and reporting.
+In this phase, we transitioned from data storage to data transformation using **dbt (data build tool)**. This layer injects business logic into our raw warehouse tables, creating refined, analytics-ready models optimized for BI tools and strategic reporting.
 
-### 🚀 First dbt Model: `order_delivery_monitoring`
-The first analytical model was successfully developed and executed. This model sits on top of the `fct_orders` table and is specifically designed to track logistics performance and supply chain efficiency.
+### 🚀 Implementation & Model Overview
+We successfully developed and executed **three core dbt models** designed to monitor logistics performance and supply chain efficiency:
+
+1.  **`order_delivery_monitoring`**: Built on top of the `fct_orders` table, this model prepares core shipment fields including delivery status, delay days, and late risk flags.
+2.  **`region_delay_summary`**: Aggregates delay metrics by geographic area to pinpoint regional bottlenecks.
+3.  **`shipping_mode_performance`**: Evaluates the efficiency of different carriers and shipping methods.
 
 ### 📊 Key Monitoring Metrics
-The model transforms raw transactional data into actionable shipping insights, including:
-* **Delivery Performance:** Tracks `delivery status` and flags `late delivery risk`.
-* **Time Analysis:** Calculates `actual shipping days` vs. `scheduled shipping days`.
-* **Delay Tracking:** Computes `delay days` to identify bottlenecks.
-* **Geographic & Logistics Context:** Includes `shipping mode`, `order region`, and `order country`.
+The models transform raw transactional data into actionable insights by tracking:
+* **Delivery Performance:** Monitors `delivery status` and flags `late delivery risk`.
+* **Time Analysis:** Calculates `actual` vs. `scheduled` shipping days to compute `delay days`.
+* **Logistics Context:** Organizes data by `shipping mode`, `order region`, and `order country`.
 
-### 🛠️ dbt Implementation
-* **Layer:** Analytics Modeling (Gold/Mart Layer).
-* **Source:** Built on top of the structured `fct_orders` table in the warehouse.
-* **Outcome:** A materialized view/table ready for visualization in tools like Power BI, Tableau, or Metabase.
+### 💡 Business Value (The "Why")
+This analytics layer is specifically designed to answer critical business questions:
+* **Real-time Tracking:** Which specific orders are currently delayed?
+* **Geographic Insights:** Which regions suffer from the highest delay rates?
+* **Operational Efficiency:** Which shipping modes are consistently underperforming or overperforming?
 
-> **Status:** ✅ Successfully compiled and ran. This marks the establishment of the **Analytics Modeling Layer**, enabling data-driven decision-making for the logistics department.
+### 🛠️ dbt Technical Stack
+* **Layer:** Analytics Modeling (Gold/Data Mart Layer).
+* **Source:** Built on structured `fct_orders` and dimension tables in the warehouse.
+* **Outcome:** Materialized views that serve as the "Single Source of Truth" for Power BI, Tableau, or Metabase.
+
+> **Status:** ✅ All models successfully compiled and ran. This marks the establishment of the **Analytics Modeling Layer**, enabling data-driven decision-making for the logistics department.
