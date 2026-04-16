@@ -159,7 +159,8 @@ print("DONE", df.shape)
 - Loaded raw data into Spark DataFrame
 
 This enables distributed processing on relational data.
-  ```
+
+  ```python
 # Download the PostgreSQL JDBC driver to enable communication between Spark and the database
 wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
 
