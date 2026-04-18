@@ -40,8 +40,7 @@ The main objectives of this project are:
 * Apply **data transformations using Spark and dbt**
 * Orchestrate workflows using Airflow
 * Store and query data efficiently using Hive
-* Deliver insights through dashboards
-
+  
 ---
 
 ## 🏗️ Architecture Overview
