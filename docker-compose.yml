@@ -1,1 +1,267 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: flowtrack_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: flowtrack
+      POSTGRES_PASSWORD: flowtrack
+      POSTGRES_DB: flowtrack
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - flowtrack_net
 
+  pgadmin:
+    image: dpage/pgadmin4:8.9
+    container_name: flowtrack_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@flowtrack.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - flowtrack_net
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: flowtrack_zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - flowtrack_net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: flowtrack_kafka
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - flowtrack_net
+
+  spark-master:
+    image: spark:3.5.8-python3
+    container_name: flowtrack_spark_master
+    restart: unless-stopped
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./spark:/opt/spark/work-dir/jobs
+      - ./data:/opt/spark/work-dir/data
+    networks:
+      - flowtrack_net
+
+  spark-worker:
+    image: spark:3.5.8-python3
+    container_name: flowtrack_spark_worker
+    restart: unless-stopped
+    depends_on:
+      - spark-master
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
+    ports:
+      - "8081:8081"
+    environment:
+      SPARK_WORKER_CORES: 2
+      SPARK_WORKER_MEMORY: 2G
+    volumes:
+      - ./spark:/opt/spark/work-dir/jobs
+      - ./data:/opt/spark/work-dir/data
+    networks:
+      - flowtrack_net
+
+  hive-metastore-db:
+    image: postgres:15
+    container_name: flowtrack_hive_metastore_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive
+      POSTGRES_DB: metastore
+    ports:
+      - "5433:5432"
+    volumes:
+      - hive_metastore_db_data:/var/lib/postgresql/data
+    networks:
+      - flowtrack_net
+
+  hive-metastore:
+    image: apache/hive:4.0.0
+    container_name: flowtrack_hive_metastore
+    restart: unless-stopped
+    depends_on:
+      - hive-metastore-db
+    environment:
+      SERVICE_NAME: metastore
+      DB_DRIVER: postgres
+      SERVICE_OPTS: >-
+        -Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver
+        -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://hive-metastore-db:5432/metastore
+        -Djavax.jdo.option.ConnectionUserName=hive
+        -Djavax.jdo.option.ConnectionPassword=hive
+    ports:
+      - "9083:9083"
+    networks:
+      - flowtrack_net
+
+  hive-server:
+    image: apache/hive:4.0.0
+    container_name: flowtrack_hive_server
+    user: "0:0"
+    restart: unless-stopped
+    depends_on:
+      - hive-metastore
+    environment:
+      SERVICE_NAME: hiveserver2
+      IS_RESUME: "true"
+      SERVICE_OPTS: >-
+        -Dhive.metastore.uris=thrift://hive-metastore:9083
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+    networks:
+      - flowtrack_net
+
+  airflow-db:
+    image: postgres:15
+    container_name: flowtrack_airflow_db
+    user: "0:0"
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5434:5432"
+    volumes:
+      - airflow_db_data:/var/lib/postgresql/data
+    networks:
+      - flowtrack_net
+
+  airflow-init:
+    image: apache/airflow:2.9.3
+    container_name: flowtrack_airflow_init
+    user: "0:0"
+    depends_on:
+      - airflow-db
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate && \
+        airflow users create \
+          --username admin \
+          --password admin \
+          --firstname Flow \
+          --lastname Track \
+          --role Admin \
+          --email admin@flowtrack.com
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - flowtrack_net
+
+  airflow-webserver:
+    image: apache/airflow:2.9.3
+    container_name: flowtrack_airflow_webserver
+    restart: unless-stopped
+    depends_on:
+      - airflow-db
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    command: webserver
+    ports:
+      - "8088:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - flowtrack_net
+
+  airflow-scheduler:
+    image: apache/airflow:2.9.3
+    container_name: flowtrack_airflow_scheduler
+    restart: unless-stopped
+    depends_on:
+      - airflow-db
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    command: scheduler
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - flowtrack_net
+
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.8.2
+    container_name: flowtrack_dbt
+    tty: true
+    stdin_open: true
+    entrypoint: ["/bin/bash", "-c"]
+    command: ["sleep infinity"]
+    volumes:
+      - ./dbt:/usr/app
+    working_dir: /usr/app
+    networks:
+      - flowtrack_net
+
+
+  producer:
+    image: python:3.10
+    container_name: flowtrack_producer
+    tty: true
+    stdin_open: true
+    command: ["tail", "-f", "/dev/null"]
+    volumes:
+      - ./producer:/app
+    working_dir: /app
+    networks:
+      - flowtrack_net
+
+
+networks:
+  flowtrack_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  hive_metastore_db_data:
+  airflow_db_data:
