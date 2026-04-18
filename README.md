@@ -1,3 +1,33 @@
+
+# 🚚 FlowTrack: End-to-End Supply Chain Data Engineering Pipeline
+
+**FlowTrack** is a robust data engineering ecosystem designed to solve the complexity of modern supply chain management. By combining **Batch Processing** for deep historical insights and **Real-Time Streaming** for proactive monitoring, FlowTrack transforms raw shipment data into actionable business intelligence.
+
+## 🌟 Project Highlights
+- **Hybrid Architecture:** Implements both Batch (ETL) and Streaming (Event-Driven) processing.
+- **Analytics Engineering:** Utilizes dbt to transform warehouse data into star-schema models.
+- **Full Automation:** Orchestrated entirely via Airflow for a "hands-off" data pipeline.
+- **Scalable Design:** Built with Dockerized microservices (Kafka, Spark, Hive, PostgreSQL).
+
+## 🛠️ The Tech Stack
+| Category | Tools |
+| :--- | :--- |
+| **Orchestration** | Apache Airflow |
+| **Processing** | Apache Spark (Batch & Streaming) |
+| **Streaming** | Apache Kafka |
+| **Modeling** | dbt (data build tool) |
+| **Storage** | Hive (Warehouse), PostgreSQL (Source) |
+| **Infrastructure** | Docker, Python, SQL |
+
+---
+
+
+
+
+
+
+
+
 # 🚚 FlowTrack: Supply Chain Monitoring Pipeline
 
 ## 📌 Project Overview
