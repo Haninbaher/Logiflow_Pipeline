@@ -287,6 +287,41 @@ The DAG automates the complex dependencies between our processing layers:
 
 > **Status:** ✅ Fully Operational. The pipeline is now a self-healing, automated system that moves data from source to insights without human oversight.
 
+
+## ⚡ Phase 8: Real-Time Streaming Pipeline (Kafka & Spark)
+
+To evolve the project from historical analysis to proactive monitoring, I implemented a real-time streaming layer. This phase introduces an **Event-Driven Architecture** to handle shipment lifecycle updates as they happen.
+
+### 🏗️ Real-Time Architecture
+The data flows through a modern streaming stack:
+**Python Producer** ➡️ **Apache Kafka** ➡️ **Spark Structured Streaming** ➡️ **Real-Time Output**
+
 ---
 
+### 🛠️ Technical Workflow
 
+#### 1. Event Simulation (The Producer)
+A custom Python script (`shipment_event_producer.py`) simulates the lifecycle of an order. It maps historical data into a stream of JSON events, including:
+* `order_created` | `packed` | `shipped` | `in_transit` | `delivered`
+* **Intelligent Tagging:** Automatically generates a `delayed` event if the `late_delivery_risk` flag is detected.
+
+#### 2. Message Broker (Kafka)
+**Apache Kafka** acts as the resilient buffer between the producer and the consumer.
+* **Topic:** `shipment_events`
+* Ensures high throughput and decoupling of data generation from data processing.
+
+#### 3. Spark Structured Streaming (The Consumer)
+A dedicated Spark streaming job (`consume_shipment_events.py`) consumes the Kafka topic in real-time.
+* **Schema Enforcement:** Parses incoming JSON strings into a structured DataFrame.
+* **Processing:** Transforms raw event logs into actionable columns for monitoring.
+* **Sink:** Currently configured to output to the console for live validation, with architecture ready for database persistence.
+
+---
+
+### ✅ Success Metrics & Validation
+The pipeline is verified as "Production-Ready" once:
+1. The Producer successfully broadcasts event batches.
+2. Kafka maintains the message queue with zero data loss.
+3. Spark processes and displays the streaming data with minimal latency.
+
+---
