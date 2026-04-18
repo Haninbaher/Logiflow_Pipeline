@@ -1,1 +1,31 @@
+from datetime import datetime
+from airflow import DAG
+from airflow.operators.bash import BashOperator
 
+with DAG(
+    dag_id="flowtrack_batch_pipeline",
+    start_date=datetime(2025, 1, 1),
+    schedule=None,
+    catchup=False,
+    tags=["flowtrack", "batch"],
+) as dag:
+
+    run_spark_batch = BashOperator(
+        task_id="run_spark_batch",
+        bash_command="""
+        docker exec flowtrack_spark_master /opt/spark/bin/spark-submit \
+          --jars /opt/spark/work-dir/postgresql-42.7.3.jar \
+          /opt/spark/work-dir/jobs/batch/load_clean_tables.py
+        """,
+    )
+
+    run_dbt_models = BashOperator(
+        task_id="run_dbt_models",
+        bash_command="""
+        docker exec flowtrack_dbt bash -c '
+        cd /usr/app/flowtrack_dbt && dbt run
+        '
+        """,
+    )
+
+    run_spark_batch >> run_dbt_models
