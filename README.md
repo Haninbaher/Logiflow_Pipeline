@@ -284,46 +284,53 @@ The DAG automates the complex dependencies between our processing layers:
 > **Status:** ✅ Fully Operational. The pipeline is now a self-healing, automated system that moves data from source to insights without human oversight.
 
 
-## ⚡ Phase 8: Real-Time Streaming Pipeline (Kafka & Spark)
+## ⚡ Phase 7: Real-Time Streaming Pipeline (Kafka, Spark & Hive)
 
-To evolve the project from historical analysis to proactive monitoring, I implemented a real-time streaming layer. This phase introduces an **Event-Driven Architecture** to handle shipment lifecycle updates as they happen.
+To extend **FlowTrack** from historical batch analytics into live shipment monitoring, a real-time streaming layer was integrated. This phase introduces an **Event-Driven Architecture** that simulates shipment lifecycle updates, streams them through Kafka, and processes them using Spark Structured Streaming.
 
 ### 🏗️ Real-Time Architecture
-The data flows through a modern streaming stack:
-**Python Producer** ➡️ **Apache Kafka** ➡️ **Spark Structured Streaming** ➡️ **Real-Time Output**
+The data flows through a modern streaming stack to enable proactive monitoring:
+**Python Generator** ➡️ **Apache Kafka** ➡️ **Spark Structured Streaming** ➡️ **Hive Warehouse**
 
 ---
 
-### 🛠️ Technical Workflow
-
-#### 1. Event Simulation (The Producer)
-A custom Python script (`shipment_event_producer.py`) simulates the lifecycle of an order. It maps historical data into a stream of JSON events, including:
+### 🎯 Objective
+The goal is to transition from static reporting to **Live Operational Visibility**. Instead of waiting for daily batch jobs, the pipeline continuously processes events as they happen, such as:
 * `order_created` | `packed` | `shipped` | `in_transit` | `delivered`
-* **Intelligent Tagging:** Automatically generates a `delayed` event if the `late_delivery_risk` flag is detected.
+* **Proactive Detection:** Automatically identifies and streams `delayed` events for shipments with a high late-delivery risk.
 
-#### 2. Message Broker (Kafka)
-**Apache Kafka** acts as the resilient buffer between the producer and the consumer.
+---
+
+### 🛠️ Real-Time Workflow
+
+#### 1. Python Generator (Event Producer)
+A custom script, `shipment_event_producer.py`, acts as the system's "Heartbeat."
+* **Function:** Reads order-level data and simulates various lifecycle stages.
+* **Payload:** Generates JSON messages containing critical attributes like `order_id`, `event_time`, `delivery_status`, and `late_delivery_risk`.
+* **Logic:** If an order is flagged with a risk of delay, the generator emits a specific `delayed` event to simulate real-world logistics bottlenecks.
+
+#### 2. Apache Kafka (The Streaming Backbone)
+Kafka serves as the resilient event bus, decoupling data generation from processing.
 * **Topic:** `shipment_events`
-* Ensures high throughput and decoupling of data generation from data processing.
+* **Role:** Provides a scalable, fault-tolerant buffer that ensures zero data loss during high-velocity event ingestion.
 
-#### 3. Spark Structured Streaming (The Consumer)
-A dedicated Spark streaming job (`consume_shipment_events.py`) consumes the Kafka topic in real-time.
-* **Schema Enforcement:** Parses incoming JSON strings into a structured DataFrame.
-* **Processing:** Transforms raw event logs into actionable columns for monitoring.
-* **Sink:** Currently configured to output to the console for live validation, with architecture ready for database persistence.
+#### 3. Spark Structured Streaming (Processing Engine)
+The streaming application, `consume_shipment_events.py`, consumes the Kafka topic continuously.
+* **Schema Enforcement:** Parses incoming JSON payloads using a predefined schema to ensure data quality.
+* **Transformation:** Converts raw, unstructured event strings into structured DataFrames in real time, making the data "analytics-ready" instantly.
 
-#### 4. Streaming Output (Validation Layer)
-The processed stream is currently written to the **Console** as a dedicated sink. This serves as a vital validation layer to confirm:
-* **Production Integrity:** Events are successfully serialized and produced by Python.
-* **Broker Reliability:** Kafka is receiving and persisting data without loss.
-* **Processing Accuracy:** Spark is correctly parsing and transforming events in real time with minimal latency.
+#### 4. Hive (Streaming Sink & Storage Layer)
+The final processed stream is persisted into **Hive**, serving as the permanent storage for real-time events.
+* **Hybrid Analytics:** Enables joining live event data with historical batch tables for deeper insights.
+* **Persistence:** Makes the entire event history queryable for downstream BI tools and monitoring dashboards.
 
 ---
 
-### ✅ Success Metrics & Validation
-The pipeline is verified as "Production-Ready" once:
-1. The Producer successfully broadcasts event batches.
-2. Kafka maintains the message queue with zero data loss.
-3. Spark processes and displays the streaming data with minimal latency.
+### ✅ Success Metrics & Achievements
+This phase successfully upgrades FlowTrack into a **Hybrid Data Platform**:
 
----
+| Feature | Batch Processing | Real-Time Streaming |
+| :--- | :--- | :--- |
+| **Focus** | Historical trends & Data Modeling | Live monitoring & Event tracking |
+| **Tools** | Spark Batch, dbt, Airflow | Kafka, Spark Streaming, Python |
+| **Outcome** | Deep Analytics & Strategic Decisions | Immediate Operational Awareness |
