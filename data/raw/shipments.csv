@@ -1,0 +1,4 @@
+shipment_id,order_id,route_id,carrier_id,origin_warehouse_id,destination_warehouse_id,created_at,promised_delivery_at,shipment_status
+S001,O001,R001,C002,W001,W002,2026-04-20 08:00:00,2026-04-21 12:00:00,CREATED
+S002,O002,R002,C001,W001,W003,2026-04-20 09:30:00,2026-04-20 18:00:00,IN_TRANSIT
+S003,O003,R003,C003,W002,W003,2026-04-20 10:15:00,2026-04-21 15:00:00,CREATED
