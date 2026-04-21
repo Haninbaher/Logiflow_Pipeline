@@ -372,13 +372,7 @@ This creates a repeatable orchestration layer instead of manually running each s
 
 ### Airflow DAG Success Screenshot
 
-> Replace the path below with your final image path if needed.
-
-```markdown
-![Airflow DAG Success](docs/images/airflow_dag_success.png)
-```
-
-You can use the screenshot you captured for this section.
+![ETL Architecture](docs/Airflow.png)
 
 ---
 
