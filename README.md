@@ -406,61 +406,24 @@ Optional:
 
 ---
 
-## 📈 Suggested Dashboard Pages
+## 📊 Dashboards
 
 ### 1) Executive Overview
 
-Recommended visuals:
+![ETL Architecture](docs/OperationsOverview.png)
 
-* total shipments
-* current delayed shipments
-* shipment status distribution
-* live shipment table
-
-Recommended tables:
-
-* `mart_live_shipment_status`
-* `mart_shipment_status`
 
 ### 2) Carrier Performance
 
-Recommended visuals:
-
-* delivery success rate by carrier
-* delayed shipments by carrier
-* total shipments by carrier
-
-Recommended table:
-
-* `mart_carrier_performance`
+![ETL Architecture](docs/CarrierPerformance.png)
 
 ### 3) Route Performance
 
-Recommended visuals:
+![ETL Architecture](docs/RoutePerformance.png)
 
-* delay rate by route
-* total shipments by route
-* route distance vs delay rate
+### 4) Alerts & Monitoring
 
-Recommended table:
-
-* `mart_route_performance`
-
-### 4) Delays & Exceptions
-
-Recommended visuals:
-
-* delay events by reason
-* delay events by carrier
-* delay events by location
-* currently delayed shipments
-
-Recommended tables:
-
-* `mart_delay_events`
-* `mart_delayed_shipments`
-
----
+![ETL Architecture](docs/Alerts&Monitoring.png)
 
 ## 🚀 How to Run the Project
 
