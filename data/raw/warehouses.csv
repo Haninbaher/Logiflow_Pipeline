@@ -2,3 +2,5 @@ warehouse_id,warehouse_name,city,country,capacity,warehouse_type
 W001,Cairo Central,Cairo,Egypt,5000,regional
 W002,Alex Hub,Alexandria,Egypt,3000,local
 W003,Giza Storage,Giza,Egypt,2500,local
+W004,Mansoura Hub,Mansoura,Egypt,2000,local
+W005,Port Said Hub,Port Said,Egypt,1800,local

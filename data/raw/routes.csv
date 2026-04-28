@@ -1,6 +1,5 @@
 route_id,origin_warehouse_id,destination_warehouse_id,distance_km,estimated_duration_hours
-R001,W001,W002,220,4.5
-R002,W001,W003,35,1.0
-R003,W002,W003,240,5.0
-R004,W003,W001,180,3.5
-R005,W002,W001,90,2.0
+R001,W001,W002,220,4.5   -- Cairo → Alexandria
+R002,W002,W004,180,3.0   -- Alexandria → Mansoura
+R003,W001,W003,35,1.0    -- Cairo → Giza
+R004,W004,W005,150,2.5   -- Mansoura → Port Said

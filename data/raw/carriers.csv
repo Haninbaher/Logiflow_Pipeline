@@ -1,4 +1,4 @@
 carrier_id,carrier_name,carrier_type,service_level
-C001,FastGo,air,express
-C002,RoadLink,ground,standard
-C003,ShipEZ,ground,premium
+C001,DHL,air,express
+C002,Aramex,ground,standard
+C003,FedEx,air,premium
