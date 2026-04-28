@@ -504,3 +504,22 @@ SELECT * FROM analytics.mart_carrier_performance;
 
 ---
 
+## 💡 Why This Project Matters
+
+This project demonstrates how modern data platforms handle both batch and streaming data to support real-time operational decision-making.
+
+It reflects real-world challenges in logistics systems such as:
+- tracking shipment lifecycle events
+- detecting delays in real time
+- monitoring system health
+- building reliable analytics layers
+  
+---
+
+## 🧠 Key Engineering Decisions
+
+- Used Kafka for streaming to simulate real-time shipment events
+- Separated raw, staging, and analytics layers for maintainability
+- Used dbt for transformation to ensure modularity and testability
+- Introduced Airflow for orchestration instead of manual execution
+- Built alerting logic to simulate real operational monitoring systems
