@@ -2,3 +2,5 @@ route_id,origin_warehouse_id,destination_warehouse_id,distance_km,estimated_dura
 R001,W001,W002,220,4.5
 R002,W001,W003,35,1.0
 R003,W002,W003,240,5.0
+R004,W003,W001,180,3.5
+R005,W002,W001,90,2.0
